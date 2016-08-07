@@ -1,0 +1,8 @@
+project(speedygrow)
+add_executable(speedygrow src/speedygrow.cpp)
+find_package(FindSDL REQUIRED)
+include_directories(${SDL2_INCLUDE_DIR})
+include_directories(include)
+target_link_libraries(speedygrow ${SDL2_LIBRARY})
+#install(TARGETS speedygrow RUNTIME DESTINATION ${BIN_DIR})
+cmake_minimum_required(VERSION 3.5)
