@@ -1,7 +1,17 @@
 project(speedygrow)
 cmake_minimum_required(VERSION 3.5)
-add_executable(speedygrow src/speedygrow.cpp)
+set(SRC src/speedygrow.cpp src/circle.cpp)
+add_executable(speedygrow ${SRC})
+
 find_package(SDL2 REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(OpenGL REQUIRED)
+
 INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIRS} ${SDL2IMAGE_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${GLEW_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
+
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${GLEW_LIBRARIES})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES})
-install(TARGETS speedygrow RUNTIME DESTINATION build)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${OPENGL_LIBRARIES})
+
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION build)
