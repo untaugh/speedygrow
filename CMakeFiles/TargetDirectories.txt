@@ -1,3 +1,0 @@
-/home/oscu/Code/speedygrow/CMakeFiles/rebuild_cache.dir
-/home/oscu/Code/speedygrow/CMakeFiles/edit_cache.dir
-/home/oscu/Code/speedygrow/CMakeFiles/speedygrow.dir
