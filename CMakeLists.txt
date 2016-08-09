@@ -1,7 +1,9 @@
 project(speedygrow)
 cmake_minimum_required(VERSION 3.5)
-set(SRC src/speedygrow.cpp src/circle.cpp)
+set(SRC src/speedygrow.cpp src/circle.cpp src/gl.cpp)
 add_executable(speedygrow ${SRC})
+
+set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall")
 
 find_package(SDL2 REQUIRED)
 find_package(GLEW REQUIRED)

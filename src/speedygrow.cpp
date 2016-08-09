@@ -2,6 +2,7 @@
 #include <SDL.h>
 #include <GL/glew.h>
 #include "circle.h"
+#include "gl.hpp"
 
 /* A simple function that prints a message, the error code returned by SDL,
  * and quits the application */
@@ -61,30 +62,38 @@ int main(int, char**){
 	/* Create our opengl context and attach it to our window */
 	maincontext = SDL_GL_CreateContext(mainwindow);
 	checkSDLError(__LINE__);
+  SDL_GL_SetSwapInterval(1);
 
+  Gl * gl = new Gl();
+  gl->init();
+  //gl->resize(512,512);
+  gl->render();
 
-	/* This makes our buffer swap syncronized with the monitor's vertical refresh */
-	SDL_GL_SetSwapInterval(1);
+  SDL_GL_SwapWindow(mainwindow);
+  SDL_Delay(2000);
 
-	/* Clear our buffer with a red background */
-	glClearColor ( 1.0, 0.0, 0.0, 1.0 );
-	glClear ( GL_COLOR_BUFFER_BIT );
-	/* Swap our back buffer to the front */
-	SDL_GL_SwapWindow(mainwindow);
-	/* Wait 2 seconds */
-	SDL_Delay(2000);
-
-	/* Same as above, but green */
-	glClearColor ( 0.0, 1.0, 0.0, 1.0 );
-	glClear ( GL_COLOR_BUFFER_BIT );
-	SDL_GL_SwapWindow(mainwindow);
-	SDL_Delay(2000);
-
-	/* Same as above, but blue */
-	glClearColor ( 0.0, 0.0, 1.0, 1.0 );
-	glClear ( GL_COLOR_BUFFER_BIT );
-	SDL_GL_SwapWindow(mainwindow);
-	SDL_Delay(2000);
+	// /* This makes our buffer swap syncronized with the monitor's vertical refresh */
+	// SDL_GL_SetSwapInterval(1);
+  //
+	// /* Clear our buffer with a red background */
+	// glClearColor ( 1.0, 0.0, 0.0, 1.0 );
+	// glClear ( GL_COLOR_BUFFER_BIT );
+	// /* Swap our back buffer to the front */
+	// SDL_GL_SwapWindow(mainwindow);
+	// /* Wait 2 seconds */
+	// SDL_Delay(2000);
+  //
+	// /* Same as above, but green */
+	// glClearColor ( 0.0, 1.0, 0.0, 1.0 );
+	// glClear ( GL_COLOR_BUFFER_BIT );
+	// SDL_GL_SwapWindow(mainwindow);
+	// SDL_Delay(2000);
+  //
+	// /* Same as above, but blue */
+	// glClearColor ( 0.0, 0.0, 1.0, 1.0 );
+	// glClear ( GL_COLOR_BUFFER_BIT );
+	// SDL_GL_SwapWindow(mainwindow);
+	// SDL_Delay(2000);
 
 	/* Delete our opengl context, destroy our window, and shutdown SDL */
 	SDL_GL_DeleteContext(maincontext);
