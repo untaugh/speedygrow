@@ -43,8 +43,8 @@ int main(int, char**){
 	/* Request opengl 3.2 context.
 	 * SDL doesn't have the ability to choose which profile at this time of writing,
 	 * but it should default to the core profile */
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
 	/* Turn on double buffering with a 24bit Z buffer.
 	 * You may need to change this to 16 or 32 for your system */
@@ -66,7 +66,7 @@ int main(int, char**){
 
   Gl * gl = new Gl();
   gl->init();
-  //gl->resize(512,512);
+  gl->resize(512,512);
   gl->render();
 
   SDL_GL_SwapWindow(mainwindow);
