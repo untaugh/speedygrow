@@ -1,6 +1,7 @@
 #include "gl.hpp"
 #include <SDL.h>
 #include <iostream>
+#include "alien.h"
 
 Gl::Gl()
 {
@@ -10,85 +11,67 @@ Gl::Gl()
   if (!GLEW_VERSION_2_1)
     exit(1);
 
-  SDL_RWops* file = SDL_RWFromFile("src/vertex.glsl", "r");
+  vertexShader = fileToShader(GL_VERTEX_SHADER, "src/vertex.glsl");
+  fragmentShader = fileToShader(GL_FRAGMENT_SHADER, "src/fragment.glsl");
 
-  if (file != NULL)
-  {
-    Uint8 buf[300];
-    int i;
-    for (i=0; i<300; i++)
-    {
-      buf[i] = 0;
-    }
-    SDL_RWread(file, buf, sizeof (buf), 1);
-    SDL_RWclose(file);
-    vertexShader = compileShader(GL_VERTEX_SHADER, (GLchar*)buf);
-  }
-  else
-  {
-    std::cout << "file not found" << std::endl;
-  }
+  circleVertexShader = fileToShader(GL_VERTEX_SHADER, "src/circlevertex.glsl");
+  circleFragmentShader = fileToShader(GL_FRAGMENT_SHADER, "src/circlefragment.glsl");
 
-  file = SDL_RWFromFile("src/fragment.glsl", "r");
-
-  if (file != NULL)
-  {
-    Uint8 buf[256];
-    int i;
-    for (i=0; i<256; i++)
-    {
-      buf[i] = 0;
-    }
-    SDL_RWread(file, buf, sizeof (buf), 1);
-    SDL_RWclose(file);
-    fragmentShader = compileShader(GL_FRAGMENT_SHADER, (GLchar*)buf);
-  }
-  else
-  {
-    std::cout << "file not found" << std::endl;
-  }
 }
 
 void Gl::init(void)
 {
   glEnable(GL_BLEND);
-  //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-  //texture = new QOpenGLTexture( QImage( ":/Textures/alien.png" ) );
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glGenTextures(1, &mTextureID );
+  glBindTexture(GL_TEXTURE_2D, mTextureID );
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, alien.width, alien.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, alien.pixel_data );
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
   glClearColor(1.0, 0.9, 1.0, 1.0);
 
   programObject = glCreateProgram();
   glAttachShader(programObject, vertexShader);
   glAttachShader(programObject, fragmentShader);
+  linkProgram(programObject);
 
-  glLinkProgram(programObject);
+  circleProgram = glCreateProgram();
+  glAttachShader(circleProgram, circleVertexShader);
+  glAttachShader(circleProgram, circleFragmentShader);
+  linkProgram(circleProgram);
 
-  GLint linked;
+  glUseProgram(circleProgram);
 
-  glGetProgramiv(programObject, GL_LINK_STATUS, &linked);
+  GLfloat v[] = {
+    0.0, 0.0,
+    1.0, 0.0,
+    0.9, 0.3,
+    0.7, 0.4,
+    0.3, 0.7,
+    0.0, 1.0,
+  };
 
-  if (linked)
-  {
-      std::cout << "linked\n";
-  }
-  else
-  {
-      std::cout << "not linked\n";
-      GLchar *info_log;
-      int n;
-      glGetProgramiv(programObject, GL_INFO_LOG_LENGTH, &n);
-      info_log = (char*)malloc(n);
-      glGetProgramInfoLog(programObject, n, &n, info_log);
-      std::cout << info_log << "\n";
-      free(info_log);
-  }
+  GLuint vbo;
+
+    vao2 = 2;
+    glGenVertexArrays(1, &vao2);
+    glBindVertexArray(vao2);
+
+  // create buffers
+  glGenBuffers(1, &vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STREAM_DRAW);
+
+  GLuint circlePosAttrib = glGetAttribLocation(programObject, "position");
+  glVertexAttribPointer(circlePosAttrib, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), 0);
+  glEnableVertexAttribArray(circlePosAttrib);
+
 
   glUseProgram(programObject);
 
   GLfloat vertices[] = {
   //  Position              Texcoords
-
       32.0f,  32.0f, 1.0f, 0.0f, // Top-right
       0.0f,  32.0f, 0.0f, 0.0f, // Top-left
        32.0f, 0.0f, 1.0f, 1.0f, // Bottom-right
@@ -100,7 +83,9 @@ void Gl::init(void)
      100.0f,  100.0f, 0.0f, 1.0f,  // Bottom-left
   };
 
-  GLuint vbo;
+  vao1 = 1;
+  glGenVertexArrays(1, &vao1);
+  glBindVertexArray(vao1);
 
   // create buffers
   glGenBuffers(1, &vbo);
@@ -122,18 +107,17 @@ void Gl::init(void)
   glVertexAttribPointer(posAttrib, 4, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat), 0);
   glEnableVertexAttribArray(posAttrib);
 
-  //
-  // // transform for 2D
-  // GLfloat move[] = {
-  //     1.0, 0.0f, 0.0f, 0.0,
-  //     0.0f, 1.0, 0.0f, 0.0,
-  //     0.0f, 0.0f, 1.0, 0.0f,
-  //     100, 100, 0.0f, 1.0f,
-  // };
-  //
-  // GLint transformLocation = glGetUniformLocation(programObject, "move");
-  // glUniformMatrix4fv(transformLocation, 1, GL_FALSE, move);
 
+  // transform for 2D
+  GLfloat move[] = {
+      1.0, 0.0f, 0.0f, 0.0,
+      0.0f, 1.0, 0.0f, 0.0,
+      0.0f, 0.0f, 1.0, 0.0f,
+      100, 100, 0.0f, 1.0f,
+  };
+
+  GLint transformLocation = glGetUniformLocation(programObject, "move");
+  glUniformMatrix4fv(transformLocation, 1, GL_FALSE, move);
 }
 
 void Gl::resize(int width, int height)
@@ -153,18 +137,73 @@ void Gl::resize(int width, int height)
 void Gl::render(void)
 {
   glClear(GL_COLOR_BUFFER_BIT);
-   //glMatrixMode( GL_MODELVIEW );
-   //glLoadIdentity();
+
+    glBindVertexArray(vao1);
+    glUseProgram(programObject);
+
+   glBindTexture( GL_TEXTURE_2D, mTextureID );
   glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
-  // glDrawArrays( GL_TRIANGLES, 0, 3);
-  //  glBegin( GL_QUADS );
-  //   glColor3f( 0.f, 1.f, 1.f );
-  //  glVertex2f( -0.5f, -0.5f );
-  //  glVertex2f( 50.5f, -0.5f );
-  //  glVertex2f( 50.5f, 0.5f );
-  //  glVertex2f( -0.5f, 0.5f );
-  //  glEnd();
+
+  glBindVertexArray(vao2);
+  glUseProgram(circleProgram);
+
+  glDrawArrays( GL_TRIANGLE_FAN, 0, 6);
+
+
 }
+
+void Gl::linkProgram(GLuint program)
+{
+  glLinkProgram(program);
+
+  GLint linked;
+
+  glGetProgramiv(program, GL_LINK_STATUS, &linked);
+
+  if (linked)
+  {
+      std::cout << "linked" << std::endl;
+  }
+  else
+  {
+      std::cout << "not linked" << std::endl;
+      GLchar *info_log;
+      int n;
+      glGetProgramiv(program, GL_INFO_LOG_LENGTH, &n);
+      info_log = (char*)malloc(n);
+      glGetProgramInfoLog(program, n, &n, info_log);
+      std::cout << info_log << std::endl;
+      free(info_log);
+  }
+}
+
+GLuint Gl::fileToShader(GLenum type, const GLchar *filename)
+{
+  SDL_RWops* file = SDL_RWFromFile(filename, "r");
+
+  GLuint shader = 0;
+
+  if (file != NULL)
+  {
+    Uint8 buf[300];
+    int i;
+    for (i=0; i<300; i++)
+    {
+      buf[i] = 0;
+    }
+    SDL_RWread(file, buf, sizeof (buf), 1);
+    SDL_RWclose(file);
+    shader = compileShader(type, (GLchar*)buf);
+  }
+  else
+  {
+    std::cout << "file not found" << std::endl;
+  }
+
+  return shader;
+
+}
+
 
 GLuint Gl::compileShader(GLenum type, const GLchar *source)
 {
