@@ -1,7 +1,6 @@
 #include <iostream>
 #include <SDL.h>
 #include <GL/glew.h>
-#include "circle.h"
 #include "gl.hpp"
 
 /* A simple function that prints a message, the error code returned by SDL,
@@ -30,10 +29,6 @@ void checkSDLError(int line = -1)
 
 int main(int, char**){
 
-	Circle * c = new Circle();
-
-	std::cout << c->radius << std::endl;
-
 	SDL_Window *mainwindow; /* Our window handle */
 	SDL_GLContext maincontext; /* Our opengl context handle */
 
@@ -53,49 +48,24 @@ int main(int, char**){
 
 	/* Create our window centered at 512x512 resolution */
 	mainwindow = SDL_CreateWindow("speedygrow", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-			512, 512, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+			640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 	if (!mainwindow) /* Die if creation failed */
 			sdldie("Unable to create window");
 
 	checkSDLError(__LINE__);
 
-	/* Create our opengl context and attach it to our window */
 	maincontext = SDL_GL_CreateContext(mainwindow);
 	checkSDLError(__LINE__);
   SDL_GL_SetSwapInterval(1);
 
   Gl * gl = new Gl();
   gl->init();
-  gl->resize(512,512);
+  gl->resize(640,480);
   gl->render();
 
   SDL_GL_SwapWindow(mainwindow);
   SDL_Delay(2000);
 
-	// /* This makes our buffer swap syncronized with the monitor's vertical refresh */
-	// SDL_GL_SetSwapInterval(1);
-  //
-	// /* Clear our buffer with a red background */
-	// glClearColor ( 1.0, 0.0, 0.0, 1.0 );
-	// glClear ( GL_COLOR_BUFFER_BIT );
-	// /* Swap our back buffer to the front */
-	// SDL_GL_SwapWindow(mainwindow);
-	// /* Wait 2 seconds */
-	// SDL_Delay(2000);
-  //
-	// /* Same as above, but green */
-	// glClearColor ( 0.0, 1.0, 0.0, 1.0 );
-	// glClear ( GL_COLOR_BUFFER_BIT );
-	// SDL_GL_SwapWindow(mainwindow);
-	// SDL_Delay(2000);
-  //
-	// /* Same as above, but blue */
-	// glClearColor ( 0.0, 0.0, 1.0, 1.0 );
-	// glClear ( GL_COLOR_BUFFER_BIT );
-	// SDL_GL_SwapWindow(mainwindow);
-	// SDL_Delay(2000);
-
-	/* Delete our opengl context, destroy our window, and shutdown SDL */
 	SDL_GL_DeleteContext(maincontext);
 	SDL_DestroyWindow(mainwindow);
 	SDL_Quit();

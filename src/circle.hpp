@@ -8,6 +8,8 @@ public:
   float radius;
   float positionX;
   float positionY;
+
+  void generateVertices(int n, float * vertices);
 };
 
 #endif // CIRCLE_H

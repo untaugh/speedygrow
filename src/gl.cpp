@@ -2,6 +2,7 @@
 #include <SDL.h>
 #include <iostream>
 #include "alien.h"
+#include "circle.hpp"
 
 Gl::Gl()
 {
@@ -45,12 +46,21 @@ void Gl::init(void)
 
   GLfloat v[] = {
     0.0, 0.0,
-    1.0, 0.0,
-    0.9, 0.3,
+    50.0, 0.0,
+    10.9, 10.3,
     0.7, 0.4,
     0.3, 0.7,
-    0.0, 1.0,
+    0.0, 50.0,
   };
+
+  GLfloat v2[100];
+  Circle* c = new Circle();
+  c->radius = 15.0;
+  c->positionY = 200;
+  c->positionX = 200;
+
+
+  c->generateVertices(20,v2);
 
   GLuint vbo;
 
@@ -61,7 +71,7 @@ void Gl::init(void)
   // create buffers
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STREAM_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(v2), v2, GL_STREAM_DRAW);
 
   GLuint circlePosAttrib = glGetAttribLocation(programObject, "position");
   glVertexAttribPointer(circlePosAttrib, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), 0);
@@ -107,7 +117,6 @@ void Gl::init(void)
   glVertexAttribPointer(posAttrib, 4, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat), 0);
   glEnableVertexAttribArray(posAttrib);
 
-
   // transform for 2D
   GLfloat move[] = {
       1.0, 0.0f, 0.0f, 0.0,
@@ -118,6 +127,7 @@ void Gl::init(void)
 
   GLint transformLocation = glGetUniformLocation(programObject, "move");
   glUniformMatrix4fv(transformLocation, 1, GL_FALSE, move);
+
 }
 
 void Gl::resize(int width, int height)
@@ -130,26 +140,36 @@ void Gl::resize(int width, int height)
       -1.0f, -1.0f, 0.0f, 1.0f,
   };
 
+  glUseProgram(programObject);
+
   GLint transformLocation = glGetUniformLocation(programObject, "transform");
   glUniformMatrix4fv(transformLocation, 1, GL_FALSE, transform);
+
+  glUseProgram(circleProgram);
+
+  transformLocation = glGetUniformLocation(circleProgram, "transform");
+  glUniformMatrix4fv(transformLocation, 1, GL_FALSE, transform);
+}
+
+void drawCircle(int n, int s)
+{
+  glDrawArrays(GL_TRIANGLE_FAN, n, s);
 }
 
 void Gl::render(void)
 {
   glClear(GL_COLOR_BUFFER_BIT);
 
-    glBindVertexArray(vao1);
-    glUseProgram(programObject);
+  glBindVertexArray(vao1);
+  glUseProgram(programObject);
 
-   glBindTexture( GL_TEXTURE_2D, mTextureID );
+  glBindTexture( GL_TEXTURE_2D, mTextureID );
   glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
   glBindVertexArray(vao2);
   glUseProgram(circleProgram);
 
-  glDrawArrays( GL_TRIANGLE_FAN, 0, 6);
-
-
+  drawCircle(0,20);
 }
 
 void Gl::linkProgram(GLuint program)
