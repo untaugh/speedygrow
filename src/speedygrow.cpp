@@ -5,8 +5,8 @@
 
 int main(int, char**){
 
-	SDL_Window *mainwindow; /* Our window handle */
-	SDL_GLContext maincontext; /* Our opengl context handle */
+	SDL_Window *mainwindow;
+	SDL_GLContext maincontext; 
 
 	SDL_Init(SDL_INIT_VIDEO);
 
