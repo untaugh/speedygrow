@@ -6,22 +6,21 @@
 
 Gl::Gl()
 {
-  GLenum err = glewInit();
-  if (err != GLEW_OK)
-    exit(1);
-  if (!GLEW_VERSION_2_1)
-    exit(1);
-
-  vertexShader = fileToShader(GL_VERTEX_SHADER, "src/vertex.glsl");
-  fragmentShader = fileToShader(GL_FRAGMENT_SHADER, "src/fragment.glsl");
-
-  circleVertexShader = fileToShader(GL_VERTEX_SHADER, "src/circlevertex.glsl");
-  circleFragmentShader = fileToShader(GL_FRAGMENT_SHADER, "src/circlefragment.glsl");
-
 }
 
 void Gl::init(void)
 {
+  GLenum err = glewInit();
+  if (err != GLEW_OK)
+    {
+      exit(1);
+    }
+
+  if (!GLEW_VERSION_2_1)
+    {
+      exit(1);
+    }
+  
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glGenTextures(1, &mTextureID );
@@ -32,6 +31,12 @@ void Gl::init(void)
 
   glClearColor(1.0, 0.9, 1.0, 1.0);
 
+  vertexShader = fileToShader(GL_VERTEX_SHADER, "src/vertex.glsl");
+  fragmentShader = fileToShader(GL_FRAGMENT_SHADER, "src/fragment.glsl");
+
+  circleVertexShader = fileToShader(GL_VERTEX_SHADER, "src/circlevertex.glsl");
+  circleFragmentShader = fileToShader(GL_FRAGMENT_SHADER, "src/circlefragment.glsl");  
+  
   programObject = glCreateProgram();
   glAttachShader(programObject, vertexShader);
   glAttachShader(programObject, fragmentShader);
@@ -44,39 +49,21 @@ void Gl::init(void)
 
   glUseProgram(circleProgram);
 
-  GLfloat v[] = {
-    0.0, 0.0,
-    50.0, 0.0,
-    10.9, 10.3,
-    0.7, 0.4,
-    0.3, 0.7,
-    0.0, 50.0,
-  };
+  world = new World();
+  world->generate(10);
 
-  GLfloat v2[100];
-  Circle* c = new Circle();
-  c->radius = 15.0;
-  c->positionY = 200;
-  c->positionX = 200;
-
-
-  c->generateVertices(20,v2);
-
-  GLuint vbo;
-
-    vao2 = 2;
-    glGenVertexArrays(1, &vao2);
-    glBindVertexArray(vao2);
+  vao2 = 2;
+  glGenVertexArrays(1, &vao2);
+  glBindVertexArray(vao2);
 
   // create buffers
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(v2), v2, GL_STREAM_DRAW);
-
+  glBufferData(GL_ARRAY_BUFFER, sizeof(circleVertices), NULL, GL_STREAM_DRAW);
+  
   GLuint circlePosAttrib = glGetAttribLocation(programObject, "position");
   glVertexAttribPointer(circlePosAttrib, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), 0);
   glEnableVertexAttribArray(circlePosAttrib);
-
 
   glUseProgram(programObject);
 
@@ -98,8 +85,8 @@ void Gl::init(void)
   glBindVertexArray(vao1);
 
   // create buffers
-  glGenBuffers(1, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glGenBuffers(1, &vbo2);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo2);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
 
   GLuint ebo;
@@ -166,10 +153,21 @@ void Gl::render(void)
   glBindTexture( GL_TEXTURE_2D, mTextureID );
   glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
-  glBindVertexArray(vao2);
   glUseProgram(circleProgram);
+  glBindVertexArray(vao2);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-  drawCircle(0,20);
+  // update buffer
+
+  int i = 0;
+  for (std::shared_ptr<Circle> circle : world->circles)
+    {
+      float vertices[100];
+      circle->generateVertices(20, vertices);
+      glBufferSubData(GL_ARRAY_BUFFER, i*20*sizeof(GLfloat), 20*sizeof(GLfloat), vertices);
+      glDrawArrays(GL_TRIANGLE_FAN, i*10, 10);
+      i++;
+    }
 }
 
 void Gl::linkProgram(GLuint program)

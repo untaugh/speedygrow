@@ -2,6 +2,7 @@
 #define GL_H
 
 #include <GL/glew.h>
+#include "world.hpp"
 
 class Gl
 {
@@ -21,6 +22,9 @@ public:
   GLuint circleVertexShader;
   GLuint circleFragmentShader;
   GLuint circleProgram;
+  World *world;
+  GLuint vbo, vbo2;
+  GLfloat circleVertices[1000];
 };
 
 #endif // GL_HPP
