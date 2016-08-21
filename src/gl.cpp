@@ -5,6 +5,7 @@
 
 Gl::Gl()
 {
+  
 }
 
 void Gl::init(void)
@@ -68,11 +69,6 @@ void Gl::resize(int width, int height)
 
   GLint transformLocation = glGetUniformLocation(circleProgram, "transform");
   glUniformMatrix4fv(transformLocation, 1, GL_FALSE, transform);
-}
-
-void drawCircle(int n, int s)
-{
-  glDrawArrays(GL_TRIANGLE_FAN, n, s);
 }
 
 void Gl::render(void)

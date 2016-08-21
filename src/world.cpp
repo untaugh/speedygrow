@@ -49,7 +49,7 @@ void World::generate(int size)
   
   for (int i = 0; i<size; i++)
     {
-      addCircle(50+i*0.5, 50+i*20, 1.0);
+      addCircle(i*0.5, i*20, 1.0);
     }
 }
 
