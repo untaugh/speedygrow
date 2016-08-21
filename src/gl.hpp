@@ -14,16 +14,12 @@ public:
   GLuint compileShader(GLenum type, const GLchar *source);
   GLuint fileToShader(GLenum type, const GLchar *filename);
   void linkProgram(GLuint program);
-  GLuint vertexShader;
-  GLuint fragmentShader;
-  GLuint programObject;
-  GLuint mTextureID;
-  GLuint vao2, vao1;
+  GLuint vao2;
   GLuint circleVertexShader;
   GLuint circleFragmentShader;
   GLuint circleProgram;
   World *world;
-  GLuint vbo, vbo2;
+  GLuint vbo;
   GLfloat circleVertices[1000];
 };
 
