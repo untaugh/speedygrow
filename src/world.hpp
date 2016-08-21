@@ -9,12 +9,11 @@
 class World
 {
 public:
-  World(void);
+  World(void);		
   std::vector<std::shared_ptr <Circle>> circles;
   void generate(int size);
-
   void addCircle(float x, float y, float r);
-  
+  void update(void);
   b2World* world;
   
 };

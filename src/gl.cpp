@@ -39,8 +39,12 @@ void Gl::init(void)
   glUseProgram(circleProgram);
 
   world = new World();
-  world->generate(10);
+  world->generate(2);
 
+  force f = world->circles[0]->calcForce(world->circles);
+
+  std::cout << f.magnitude << " " << f.direction << std::endl;
+  
   vao2 = 2;
   glGenVertexArrays(1, &vao2);
   glBindVertexArray(vao2);
@@ -57,12 +61,14 @@ void Gl::init(void)
 
 void Gl::resize(int width, int height)
 {
+  GLfloat ratio = (float)width/(float)height;
+  
   // transform for 2D
   GLfloat transform[] = {
-      2.0f/(float)width, 0.0f, 0.0f, 0.0,
-      0.0f, 2.0f/(float)height, 0.0f, 0.0,
+    2.0f/(100*ratio), 0.0f, 0.0f, 0.0,
+      0.0f, 2.0f/100, 0.0f, 0.0,
       0.0f, 0.0f, 2.0f, 0.0f,
-      -1.0f, -1.0f, 0.0f, 1.0f,
+      -0.0f, -0.0f, 0.0f, 1.0f,
   };
 
   glUseProgram(circleProgram);
@@ -73,6 +79,8 @@ void Gl::resize(int width, int height)
 
 void Gl::render(void)
 {
+  world->update();
+  
   glClear(GL_COLOR_BUFFER_BIT);
 
   glUseProgram(circleProgram);

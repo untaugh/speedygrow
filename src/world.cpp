@@ -53,3 +53,20 @@ void World::generate(int size)
     }
 }
 
+void World::update(void)
+{
+  for (std::shared_ptr<Circle> circle : circles)
+    {
+      force f = circle->calcForce(circles);
+      std::complex<float> cf = std::polar(f.magnitude, f.direction);
+      std::complex<float> cv = std::polar(circle->velocity.speed, circle->velocity.direction);
+
+      cv = cv + cf;
+      
+      circle->velocity.speed = abs(cv);
+      circle->velocity.direction = arg(cv);
+
+      circle->positionX = cv.real();
+      circle->positionY = cv.imag();      
+    }
+}
