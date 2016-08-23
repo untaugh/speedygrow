@@ -2,7 +2,7 @@
 
 World::World(void)
 {
-  b2Vec2 gravity(0.0f, -20.0f);
+  b2Vec2 gravity(0.0f, -1.0f);
   world = new b2World(gravity);
 
   b2BodyDef groundBodyDef;
@@ -49,24 +49,58 @@ void World::generate(int size)
   
   for (int i = 0; i<size; i++)
     {
-      addCircle(i*0.5, i*20, 1.0);
+      addCircle(i*50, i*50, 1.0);
     }
+
+  addCircle(20, 70, 1.0);
+
 }
 
 void World::update(void)
 {
+
+   for (std::shared_ptr<Circle> circle : circles)
+     {
+       for (std::shared_ptr<Circle> otherCircle : circles)
+	 {
+	   if (circle != otherCircle)
+	     {
+
+	   const b2Vec2& p1 = circle->body->GetPosition();
+	   const b2Vec2& p2 = otherCircle->body->GetPosition();
+	   b2Vec2 p3 = (p2-p1);
+
+	   float d = b2Distance(p1,p2);
+	   float a = b2Atan2(p3.y,p3.x);;
+
+
+	   p3.Normalize();
+	   p3 *= 100/d;
+
+	   std::cout << d << " " << a <<  " " << p3.x << " " << p3.y << std::endl;
+
+	   //b2Vec2 p4(10,10);
+
+	   
+	   circle->body->ApplyForceToCenter(p3, true);
+	     }
+	 }
+     }
+  
+  int i = 0;
   for (std::shared_ptr<Circle> circle : circles)
     {
       force f = circle->calcForce(circles);
-      std::complex<float> cf = std::polar(f.magnitude, f.direction);
+
+      std::complex<float> cf = std::polar(f.magnitude/10, f.direction);
       std::complex<float> cv = std::polar(circle->velocity.speed, circle->velocity.direction);
 
       cv = cv + cf;
       
       circle->velocity.speed = abs(cv);
       circle->velocity.direction = arg(cv);
-
-      circle->positionX = cv.real();
-      circle->positionY = cv.imag();      
+      
+      circle->positionX = circle->positionX + cv.real();
+      circle->positionY = circle->positionY + cv.imag();
     }
 }

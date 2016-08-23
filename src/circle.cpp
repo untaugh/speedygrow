@@ -23,13 +23,13 @@ void Circle::generateVertices(int n, float * vertices)
   b2Vec2 position = body->GetPosition();
   
   // center of circle
-  vertices[0] = positionX;
-  vertices[1] = positionY;
+  vertices[0] = position.x;
+  vertices[1] = position.y;
   
   for (i=0; i<n-2; i=i+2)
     {
-      vertices[i+2] = cos((2*PI*i)/(n-4)) * radius + positionX;
-      vertices[i+3] = sin((2*PI*i)/(n-4)) * radius + positionY;
+      vertices[i+2] = cos((2*PI*i)/(n-4)) * radius + position.x;
+      vertices[i+3] = sin((2*PI*i)/(n-4)) * radius + position.y;
     }
 }
 
@@ -73,6 +73,8 @@ float Circle::calcDistance(std::shared_ptr<Circle> circle)
 
   float dist = sqrt(dx*dx+dy*dy);
 
+  dist = dist - this->radius - circle->radius;
+  
   return dist;
 }
 

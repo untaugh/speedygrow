@@ -42,6 +42,30 @@ TEST_CASE("Circle physics", "[circle]")
 
 }
 
+TEST_CASE("Circle more physics", "[circle]")
+{
+  std::shared_ptr<Circle> c1(new Circle());
+  std::shared_ptr<Circle> c2(new Circle());
+
+  std::vector<std::shared_ptr<Circle>> circles;
+
+  circles.push_back(c1);
+  circles.push_back(c2);
+  
+  c1->positionX = 0.0001;
+  c1->positionY = 0.0001;
+
+  c2->positionX = 50.0;
+  c2->positionY = 50.0;
+
+  //REQUIRE(c1->calcDistance(c2) == 5.0);
+  //REQUIRE(c2->calcDistance(c1) == 5.0);  
+
+  force f = c2->calcForce(circles);
+  REQUIRE( f.magnitude  == Approx(1)); 
+
+}
+
 TEST_CASE("World class", "[world]")
 {
   World* w = new World();

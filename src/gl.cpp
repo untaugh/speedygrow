@@ -65,8 +65,8 @@ void Gl::resize(int width, int height)
   
   // transform for 2D
   GLfloat transform[] = {
-    2.0f/(100*ratio), 0.0f, 0.0f, 0.0,
-      0.0f, 2.0f/100, 0.0f, 0.0,
+    2.0f/(200*ratio), 0.0f, 0.0f, 0.0,
+      0.0f, 2.0f/200, 0.0f, 0.0,
       0.0f, 0.0f, 2.0f, 0.0f,
       -0.0f, -0.0f, 0.0f, 1.0f,
   };
